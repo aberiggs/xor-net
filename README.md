@@ -1,4 +1,4 @@
-# XOR Network from Scratch (Rust)
+# xor-net
 
 This is a mini-project where I implemented a neural network for XOR by hand in Rust.
 
