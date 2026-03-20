@@ -188,11 +188,11 @@ impl XORNetwork {
             let mut loss = 0.0;
             for &(a, b, y) in &data_set {
                 let forward_data = self.forward(a, b);
-                loss += mse_loss(forward_data.a3, y as f32);
+                loss += mse_loss(forward_data.a3, y);
                 self.backward(forward_data, y, learning_rate);
             }
 
-            if i % 100_000 == 0 {
+            if i == epochs - 1 || i % 100_000 == 0 {
                 println!(
                     "[Epoch {}] Average loss: {}",
                     i + 1,
@@ -203,12 +203,8 @@ impl XORNetwork {
     }
 }
 
-fn check_prediction_output(y_hat: bool, y: bool) -> String {
-    if y_hat == y {
-        String::from("✓")
-    } else {
-        String::from("✗")
-    }
+fn check_prediction_output(y_hat: bool, y: bool) -> &'static str {
+    if y_hat == y { "✓" } else { "✗" }
 }
 
 fn main() {
