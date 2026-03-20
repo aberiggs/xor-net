@@ -1,4 +1,4 @@
-use rand::RngExt;
+use rand::{RngExt, seq::SliceRandom};
 
 fn sigmoid(x: f32) -> f32 {
     1.0 / (1.0 + (-x).exp())
@@ -175,7 +175,7 @@ impl XORNetwork {
     }
 
     fn train(&mut self, epochs: usize, learning_rate: f32) {
-        let data_set: Vec<(f32, f32, f32)> = vec![
+        let mut data_set: Vec<(f32, f32, f32)> = vec![
             (0.0, 0.0, 0.0),
             (0.0, 1.0, 1.0),
             (1.0, 0.0, 1.0),
@@ -183,6 +183,8 @@ impl XORNetwork {
         ];
 
         for i in 0..epochs {
+            data_set.shuffle(&mut rand::rng());
+
             let mut loss = 0.0;
             for &(a, b, y) in &data_set {
                 let forward_data = self.forward(a, b);
@@ -201,13 +203,25 @@ impl XORNetwork {
     }
 }
 
+fn check_prediction_output(y_hat: bool, y: bool) -> String {
+    if y_hat == y {
+        String::from("✓")
+    } else {
+        String::from("✗")
+    }
+}
+
 fn main() {
     let mut net = XORNetwork::new();
     net.train(1_000_000, 0.001);
 
     println!("\nTraining complete! Testing...");
-    println!("0 ^ 0 = {}", net.predict(false, false));
-    println!("0 ^ 1 = {}", net.predict(false, true));
-    println!("1 ^ 0 = {}", net.predict(true, false));
-    println!("1 ^ 1 = {}", net.predict(true, true));
+    let f_f = net.predict(false, false);
+    println!("0 ^ 0 = {} {}", f_f, check_prediction_output(f_f, false));
+    let f_t = net.predict(false, true);
+    println!("0 ^ 1 = {} {}", f_t, check_prediction_output(f_t, true));
+    let t_f = net.predict(true, false);
+    println!("1 ^ 0 = {} {}", t_f, check_prediction_output(t_f, true));
+    let t_t = net.predict(true, true);
+    println!("1 ^ 1 = {} {}", t_t, check_prediction_output(t_t, false));
 }
